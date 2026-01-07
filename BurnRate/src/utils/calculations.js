@@ -8,10 +8,51 @@ export function generateId() {
 }
 
 /**
+ * Parse period string to number of days
+ */
+export function parsePeriodToDays(period) {
+    const match = period.match(/(\d+)\s*(day|days|week|month|months|year)/i)
+    if (!match) return 30 // default to 30 days
+
+    const num = parseInt(match[1])
+    const unit = match[2].toLowerCase()
+
+    switch (unit) {
+        case 'day':
+        case 'days':
+            return num
+        case 'week':
+            return num * 7
+        case 'month':
+        case 'months':
+            return num * 30
+        case 'year':
+            return num * 365
+        default:
+            return 30
+    }
+}
+
+/**
+ * Filter transactions by period
+ */
+export function filterByPeriod(transactions, period) {
+    const days = parsePeriodToDays(period)
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - days)
+
+    return transactions.filter(t => {
+        const tDate = new Date(t.date)
+        return tDate >= cutoffDate
+    })
+}
+
+/**
  * Calculate the total balance from transactions
  */
-export function calculateBalance(transactions) {
-    return transactions.reduce((balance, t) => {
+export function calculateBalance(transactions, period = null) {
+    const filtered = period ? filterByPeriod(transactions, period) : transactions
+    return filtered.reduce((balance, t) => {
         if (t.type === 'income') {
             return balance + t.amount
         } else {
@@ -23,8 +64,9 @@ export function calculateBalance(transactions) {
 /**
  * Calculate total income
  */
-export function calculateTotalIncome(transactions) {
-    return transactions
+export function calculateTotalIncome(transactions, period = null) {
+    const filtered = period ? filterByPeriod(transactions, period) : transactions
+    return filtered
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + t.amount, 0)
 }
@@ -32,8 +74,9 @@ export function calculateTotalIncome(transactions) {
 /**
  * Calculate total expenses
  */
-export function calculateTotalExpenses(transactions) {
-    return transactions
+export function calculateTotalExpenses(transactions, period = null) {
+    const filtered = period ? filterByPeriod(transactions, period) : transactions
+    return filtered
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + t.amount, 0)
 }
@@ -143,12 +186,12 @@ export function getCategoryBreakdown(transactions, type = 'expense') {
         'Other': '#A7A8AB',
     }
 
-    return Object.entries(categoryMap).map(([name, value]) => ({
+    return Object.entries(categoryMap).map(([name, rawAmount]) => ({
         name,
-        value: total > 0 ? Math.round((value / total) * 100) : 0,
-        amount: value,
+        value: total > 0 ? Math.round((rawAmount / total) * 100) : 0,
+        amount: rawAmount,
         color: colors[name] || '#A7A8AB'
-    }))
+    })).sort((a, b) => b.value - a.value)
 }
 
 /**
@@ -182,7 +225,7 @@ export function getBalanceHistory(transactions, days = 7) {
     const maxValue = Math.max(...result.map(r => r.value), 1)
     return result.map(r => ({
         ...r,
-        value: Math.round((r.value / maxValue) * 100)
+        y: (r.value / maxValue) * 100
     }))
 }
 
@@ -197,16 +240,48 @@ export function formatCurrency(value, currency = '$') {
 }
 
 /**
- * Get chart points for area charts (normalized 0-100)
+ * Get chart points for sparkline area charts (normalized 0-100)
+ * Generates daily points for the given period
  */
-export function getChartPoints(transactions, type, months = 6) {
-    const aggregates = getMonthlyAggregates(transactions, months)
-    const values = aggregates.map(a => type === 'income' ? a.income : a.expense)
+export function getChartPoints(transactions, type, days = 7) {
+    const result = []
+    const now = new Date()
+
+    // For longer periods (> 30 days), maybe we could group by week, 
+    // but the request asks for "each day". Let's try daily for now.
+
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(now)
+        date.setDate(date.getDate() - i)
+        // Format label: "Jan 1"
+        const label = date.toLocaleString('en-US', { month: 'short', day: 'numeric' })
+
+        // Filter transactions for THIS DAY only (not cumulative)
+        const dayTransactions = transactions.filter(t => {
+            const tDate = new Date(t.date)
+            return tDate.getDate() === date.getDate() &&
+                tDate.getMonth() === date.getMonth() &&
+                tDate.getFullYear() === date.getFullYear()
+        })
+
+        const value = dayTransactions
+            .filter(t => t.type === type)
+            .reduce((sum, t) => sum + t.amount, 0)
+
+        result.push({
+            label,
+            value,
+            date: date.toISOString().split('T')[0]
+        })
+    }
+
+    const values = result.map(r => r.value)
     const maxValue = Math.max(...values, 1)
 
-    return values.map((v, i) => ({
-        x: (i / (values.length - 1)) * 100,
-        y: (v / maxValue) * 100
+    return result.map((r, i) => ({
+        x: (i / (result.length - 1)) * 100,
+        y: (r.value / maxValue) * 100,
+        ...r
     }))
 }
 

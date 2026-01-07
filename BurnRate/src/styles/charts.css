@@ -1,0 +1,111 @@
+/* ========================================
+   Chart Styles
+   Bar, area, line, pie charts
+   ======================================== */
+
+/* Bar Chart */
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    width: 100%;
+    padding-top: var(--space-md);
+}
+
+.bar-chart-bar {
+    flex: 1;
+    background-color: var(--chart-bar);
+    border-radius: var(--space-xs);
+    transition: opacity var(--transition-fast);
+}
+
+.bar-chart-bar:hover {
+    opacity: 0.8;
+}
+
+/* Area Chart */
+.area-chart {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.area-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Line Chart */
+.line-chart {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.line-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Pie Chart / Donut */
+.pie-chart {
+    position: relative;
+}
+
+.pie-chart-svg {
+    transform: rotate(-90deg);
+}
+
+.pie-chart-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.pie-chart-value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.pie-chart-text {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+/* Chart Tooltip */
+.chart-tooltip {
+    position: absolute;
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-hover);
+    pointer-events: none;
+    z-index: 9999;
+    white-space: nowrap;
+    transform: translate(-50%, -100%);
+    margin-top: -8px;
+}
+
+.chart-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--bg-card);
+}
+
+.chart-data-point {
+    cursor: pointer;
+    transition: r 0.15s ease;
+}
+
+.chart-data-point:hover {
+    r: 6;
+}

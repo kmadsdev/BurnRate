@@ -1,0 +1,473 @@
+/* ========================================
+   Mobile Responsive Styles
+   All breakpoints for mobile/tablet
+   ======================================== */
+
+/* Extra Large Desktops (1920px+) */
+@media (min-width: 1920px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Medium Desktops (1200px - 1399px) */
+@media (max-width: 1399px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .widget.size-2x1 {
+        grid-column: span 2;
+    }
+
+    .widget.size-3x1 {
+        grid-column: span 3;
+    }
+}
+
+/* Small Desktops / Large Tablets (1024px - 1199px) */
+@media (max-width: 1199px) {
+    :root {
+        --sidebar-width: 80px;
+        --grid-gap: 16px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .widget.size-2x1,
+    .widget.size-3x1 {
+        grid-column: span 2;
+    }
+
+    .widget-value {
+        font-size: 36px;
+    }
+
+    .widget-value-prefix {
+        font-size: 20px;
+    }
+}
+
+/* Tablets (768px - 1023px) */
+@media (max-width: 1023px) {
+    :root {
+        --sidebar-width: 72px;
+        --grid-gap: 16px;
+        --widget-min-height: 300px;
+    }
+
+    .sidebar-nav-item {
+        width: 40px;
+        height: 40px;
+    }
+
+    .sidebar-nav-item svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .sidebar-logo svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .widget {
+        padding: var(--space-md);
+    }
+
+    .widget-icon-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .widget-icon-circle svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .widget-value {
+        font-size: 32px;
+    }
+
+    .goal-chart {
+        width: 70px;
+        height: 70px;
+    }
+
+    .goals-container {
+        gap: var(--space-md);
+    }
+
+    .activity-chart-container {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .widget.size-2x1 .activity-legend {
+        justify-content: center;
+    }
+}
+
+/* Large Mobile / Small Tablets (600px - 767px) */
+@media (max-width: 767px) {
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        height: auto;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: var(--space-sm) 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    html.dark .sidebar {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        margin-top: 0;
+        gap: 0;
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .sidebar-nav-item {
+        width: 44px;
+        height: 44px;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 60px;
+        padding: var(--space-md);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .widget.size-1x1,
+    .widget.size-2x1,
+    .widget.size-1x2,
+    .widget.size-3x1 {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+
+    .widget {
+        min-height: 280px;
+    }
+
+    .widget-header {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .widget-value {
+        font-size: 28px;
+    }
+
+    .widget-value-prefix {
+        font-size: 18px;
+    }
+
+    .dashboard-title {
+        font-size: 24px;
+    }
+
+    .history-legend {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .activity-chart-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .activity-legend {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-sm);
+    }
+
+    .activity-legend-item {
+        min-width: auto;
+    }
+
+    .goals-container {
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
+
+    .goal-item {
+        flex: 0 0 calc(33.33% - var(--space-md));
+        min-width: 80px;
+    }
+
+    .goal-chart {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* Table responsive */
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .page-header .btn {
+        width: 100%;
+    }
+
+    .tabs {
+        width: 100%;
+    }
+
+    .tab {
+        flex: 1;
+        text-align: center;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: var(--space-sm);
+        font-size: var(--font-size-sm);
+    }
+
+    .table-description {
+        display: none;
+    }
+}
+
+/* Medium Mobile (480px - 599px) */
+@media (max-width: 599px) {
+    :root {
+        --space-lg: 16px;
+        --space-xl: 20px;
+    }
+
+    .main-content {
+        padding: var(--space-sm);
+    }
+
+    .dashboard-header {
+        margin-bottom: var(--space-md);
+    }
+
+    .widget {
+        padding: var(--space-md);
+        min-height: 240px;
+    }
+
+    .widget-icon-circle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .widget-title {
+        font-size: var(--font-size-md);
+    }
+
+    .widget-value {
+        font-size: 24px;
+    }
+
+    .widget-value-prefix {
+        font-size: 16px;
+    }
+
+    .bar-chart {
+        gap: 4px;
+    }
+
+    .bar-chart-bar {
+        min-width: 6px;
+    }
+
+    .goal-item {
+        flex: 0 0 calc(50% - var(--space-sm));
+    }
+}
+
+/* Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+    :root {
+        --grid-gap: 12px;
+    }
+
+    .main-content {
+        padding: var(--space-xs);
+        margin-bottom: 56px;
+    }
+
+    .dashboard-grid {
+        gap: 12px;
+    }
+
+    .widget {
+        padding: 12px;
+        min-height: 220px;
+        border-radius: var(--radius-md);
+    }
+
+    .widget-header {
+        margin-bottom: var(--space-sm);
+    }
+
+    .widget-header-left {
+        gap: var(--space-sm);
+    }
+
+    .widget-icon-circle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .widget-icon-circle svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .widget-title {
+        font-size: var(--font-size-sm);
+    }
+
+    .widget-period-selector {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-xs);
+    }
+
+    .widget-value {
+        font-size: 22px;
+    }
+
+    .widget-value-prefix {
+        font-size: 14px;
+    }
+
+    .widget-value-container {
+        margin-bottom: var(--space-sm);
+    }
+
+    .dashboard-title {
+        font-size: 20px;
+    }
+
+    .sidebar-nav-item {
+        width: 40px;
+        height: 40px;
+    }
+
+    .goal-item {
+        flex: 0 0 100%;
+    }
+
+    .goal-chart {
+        width: 50px;
+        height: 50px;
+    }
+
+    .goals-container {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .goal-item {
+        flex: 0 0 auto;
+    }
+
+    /* Table responsive */
+    .table-frequency {
+        display: none;
+    }
+
+    .modal-content {
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Extra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+    .main-content {
+        padding: 4px;
+    }
+
+    .dashboard-grid {
+        gap: 8px;
+    }
+
+    .widget {
+        padding: 8px;
+        min-height: 200px;
+    }
+
+    .widget-icon-circle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .widget-value {
+        font-size: 18px;
+    }
+
+    .widget-value-prefix {
+        font-size: 12px;
+    }
+
+    .widget-title {
+        font-size: 11px;
+    }
+
+    .dashboard-title {
+        font-size: 18px;
+    }
+
+    .sidebar {
+        padding: 4px 0;
+    }
+
+    .sidebar-nav-item {
+        width: 36px;
+        height: 36px;
+    }
+
+    .sidebar-nav-item svg {
+        width: 16px;
+        height: 16px;
+    }
+}
