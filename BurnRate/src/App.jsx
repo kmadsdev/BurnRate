@@ -10,6 +10,7 @@ import Wallet from './pages/Wallet'
 import Analytics from './pages/Analytics'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
+import Goals from './pages/Goals'
 
 function App() {
     useEffect(() => {
@@ -48,6 +49,7 @@ function App() {
                                     <Route path="/" element={<Dashboard />} />
                                     <Route path="/wallet" element={<Wallet />} />
                                     <Route path="/analytics" element={<Analytics />} />
+                                    <Route path="/goals" element={<Goals />} />
                                     <Route path="/calendar" element={<Calendar />} />
                                     <Route path="/settings" element={<Settings />} />
                                 </Routes>
