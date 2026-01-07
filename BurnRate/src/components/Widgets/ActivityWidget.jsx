@@ -1,6 +1,7 @@
+import { useState, useMemo } from 'react'
 import WidgetContainer from './WidgetContainer'
 import { useData } from '../../context/DataContext'
-import { getCategoryBreakdown } from '../../utils/calculations'
+import { getCategoryBreakdown, filterByPeriod, formatCurrency } from '../../utils/calculations'
 
 function DonutChart({ data, size = 140 }) {
     if (!data || data.length === 0) {
@@ -52,17 +53,32 @@ function DonutChart({ data, size = 140 }) {
     )
 }
 
+const periodOptions = ['This week', 'This month', '3 months']
+
+const periodToDays = {
+    'This week': '7 days',
+    'This month': '30 days',
+    '3 months': '90 days',
+}
+
 function ActivityWidget({ size = '1x1' }) {
     const { transactions } = useData()
-    const categoryData = getCategoryBreakdown(transactions, 'expense')
+    const [period, setPeriod] = useState('This month')
+
+    const categoryData = useMemo(() => {
+        const filterPeriod = periodToDays[period] || '30 days'
+        const filtered = filterByPeriod(transactions, filterPeriod)
+        return getCategoryBreakdown(filtered, 'expense')
+    }, [transactions, period])
 
     return (
         <WidgetContainer
             id="activity"
             title="Activity"
             size={size}
-            periodOptions={['This week', 'This month', '3 months']}
-            defaultPeriod="This month"
+            periodOptions={periodOptions}
+            defaultPeriod={period}
+            onPeriodChange={setPeriod}
         >
             <div className="activity-widget">
                 <div className="activity-chart-container">
@@ -70,7 +86,7 @@ function ActivityWidget({ size = '1x1' }) {
 
                     <div className="activity-legend">
                         {categoryData.length > 0 ? (
-                            categoryData.slice(0, 5).map((category, index) => (
+                            categoryData.slice(0, size === '2x1' ? 6 : 5).map((category, index) => (
                                 <div key={index} className="activity-legend-item">
                                     <span
                                         className="activity-legend-color"
@@ -78,7 +94,7 @@ function ActivityWidget({ size = '1x1' }) {
                                     />
                                     <span>{category.name}</span>
                                     <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
-                                        {category.value}%
+                                        {formatCurrency(category.amount)} ({category.value}%)
                                     </span>
                                 </div>
                             ))

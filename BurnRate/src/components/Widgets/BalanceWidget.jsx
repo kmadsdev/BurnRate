@@ -1,7 +1,8 @@
+import { useState, useMemo } from 'react'
 import WidgetContainer from './WidgetContainer'
 import { BarChart } from '../Charts'
 import { useData } from '../../context/DataContext'
-import { calculateBalance, getBalanceHistory, formatCurrency } from '../../utils/calculations'
+import { calculateBalance, getBalanceHistory } from '../../utils/calculations'
 
 const BalanceIcon = () => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -11,20 +12,35 @@ const BalanceIcon = () => (
     </svg>
 )
 
-function BalanceWidget() {
+const periodToDays = {
+    '7 days': 7,
+    '30 days': 30,
+    '90 days': 90,
+}
+
+function BalanceWidget({ size = '1x1' }) {
     const { transactions } = useData()
-    const balance = calculateBalance(transactions)
-    const historyData = getBalanceHistory(transactions, 7)
+    const [period, setPeriod] = useState('7 days')
+
+    const days = periodToDays[period] || 7
+
+    const { balance, historyData } = useMemo(() => {
+        return {
+            balance: calculateBalance(transactions),
+            historyData: getBalanceHistory(transactions, days)
+        }
+    }, [transactions, days])
 
     return (
         <WidgetContainer
             id="balance"
             title="Balance"
-            size="1x1"
+            size={size}
             accent="primary"
             icon={<BalanceIcon />}
             periodOptions={['7 days', '30 days', '90 days']}
-            defaultPeriod="7 days"
+            defaultPeriod={period}
+            onPeriodChange={setPeriod}
         >
             <div className="widget-value-container">
                 <div className="widget-value">

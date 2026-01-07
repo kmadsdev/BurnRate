@@ -1,7 +1,8 @@
+import { useState, useMemo } from 'react'
 import WidgetContainer from './WidgetContainer'
 import { AreaChart } from '../Charts'
 import { useData } from '../../context/DataContext'
-import { calculateTotalExpenses, getChartPoints, formatCurrency } from '../../utils/calculations'
+import { calculateTotalExpenses, getChartPoints, filterByPeriod, parsePeriodToDays } from '../../utils/calculations'
 
 const ExpensesIcon = () => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#FF4F79" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -13,8 +14,16 @@ const ExpensesIcon = () => (
 
 function ExpensesWidget({ size = '1x1' }) {
     const { transactions } = useData()
-    const totalExpenses = calculateTotalExpenses(transactions)
-    const chartPoints = getChartPoints(transactions, 'expense', 6)
+    const [period, setPeriod] = useState('7 days')
+
+    const { totalExpenses, chartPoints } = useMemo(() => {
+        const filtered = filterByPeriod(transactions, period)
+        const days = parsePeriodToDays(period)
+        return {
+            totalExpenses: calculateTotalExpenses(filtered),
+            chartPoints: getChartPoints(transactions, 'expense', days)
+        }
+    }, [transactions, period])
 
     return (
         <WidgetContainer
@@ -24,7 +33,8 @@ function ExpensesWidget({ size = '1x1' }) {
             accent="expenses"
             icon={<ExpensesIcon />}
             periodOptions={['7 days', '30 days', '90 days']}
-            defaultPeriod="7 days"
+            defaultPeriod={period}
+            onPeriodChange={setPeriod}
         >
             <div className="widget-value-container">
                 <div className="widget-value" style={{ color: 'var(--text-primary)' }}>
@@ -38,7 +48,7 @@ function ExpensesWidget({ size = '1x1' }) {
 
             <div className="widget-chart">
                 <AreaChart
-                    points={chartPoints.length > 0 ? chartPoints : [{ x: 0, y: 0 }, { x: 100, y: 0 }]}
+                    points={chartPoints.length > 1 ? chartPoints : [{ x: 0, y: 0 }, { x: 100, y: 0 }]}
                     strokeColor="#FF4F79"
                     fillColor="rgba(255, 79, 121, 0.2)"
                     height={120}

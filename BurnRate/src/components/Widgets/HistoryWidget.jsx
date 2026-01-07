@@ -1,37 +1,53 @@
+import { useState, useMemo } from 'react'
 import WidgetContainer from './WidgetContainer'
 import { LineChart } from '../Charts'
 import { useData } from '../../context/DataContext'
 import { getMonthlyAggregates, predictNext } from '../../utils/calculations'
 
-function HistoryWidget() {
+const periodToMonths = {
+    '3 months': 3,
+    '6 months': 6,
+    '12 months': 12,
+}
+
+function HistoryWidget({ size = '2x1' }) {
     const { transactions } = useData()
+    const [period, setPeriod] = useState('6 months')
 
-    // Get actual monthly data
-    const monthlyData = getMonthlyAggregates(transactions, 6)
+    const { incomeData, outcomeData, timeline } = useMemo(() => {
+        const months = periodToMonths[period] || 6
 
-    // Get predictions (3 months)
-    const predictions = predictNext(monthlyData, 4)
+        // Get actual monthly data
+        const monthlyData = getMonthlyAggregates(transactions, months)
 
-    // Combine for chart
-    const incomeData = [
-        ...monthlyData.map(m => ({ month: m.month, value: m.income, predicted: false })),
-        ...predictions.map(p => ({ month: p.month, value: p.income, predicted: true }))
-    ]
+        // Get predictions (based on period)
+        const predictionMonths = Math.ceil(months / 2)
+        const predictions = predictNext(monthlyData, predictionMonths)
 
-    const outcomeData = [
-        ...monthlyData.map(m => ({ month: m.month, value: m.expense, predicted: false })),
-        ...predictions.map(p => ({ month: p.month, value: p.expense, predicted: true }))
-    ]
+        // Combine for chart
+        const income = [
+            ...monthlyData.map(m => ({ month: m.month, value: m.income, predicted: false })),
+            ...predictions.map(p => ({ month: p.month, value: p.income, predicted: true }))
+        ]
 
-    const timeline = [...monthlyData.map(m => m.month), ...predictions.map(p => p.month)]
+        const outcome = [
+            ...monthlyData.map(m => ({ month: m.month, value: m.expense, predicted: false })),
+            ...predictions.map(p => ({ month: p.month, value: p.expense, predicted: true }))
+        ]
+
+        const tl = [...monthlyData.map(m => m.month), ...predictions.map(p => p.month)]
+
+        return { incomeData: income, outcomeData: outcome, timeline: tl }
+    }, [transactions, period])
 
     return (
         <WidgetContainer
             id="history"
             title="History"
-            size="2x1"
+            size={size}
             periodOptions={['3 months', '6 months', '12 months']}
-            defaultPeriod="6 months"
+            defaultPeriod={period}
+            onPeriodChange={setPeriod}
             showPeriodSelector={true}
         >
             <div className="history-widget">
