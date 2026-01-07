@@ -19,6 +19,7 @@ function PieChart({
                 width={size}
                 height={size}
                 viewBox={`0 0 ${size} ${size}`}
+                style={{ display: 'block' }}
             >
                 {/* Background circle */}
                 <circle
