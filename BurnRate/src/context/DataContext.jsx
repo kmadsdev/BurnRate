@@ -4,6 +4,7 @@ import { generateId } from '../utils/calculations'
 const DataContext = createContext()
 
 const STORAGE_KEY = 'burnrate-transactions'
+const GOALS_STORAGE_KEY = 'burnrate-goals'
 
 // Sample data for initial setup
 const SAMPLE_DATA = [
@@ -81,6 +82,28 @@ const SAMPLE_DATA = [
     ...generateHistoricalData()
 ]
 
+// Sample goals data
+const SAMPLE_GOALS = [
+    {
+        id: generateId(),
+        title: 'Emergency Fund',
+        targetAmount: 10000,
+        currentAmount: 2500,
+        deadline: '2026-12-31',
+        category: 'Savings',
+        completed: false
+    },
+    {
+        id: generateId(),
+        title: 'New Laptop',
+        targetAmount: 2000,
+        currentAmount: 800,
+        deadline: '2026-06-30',
+        category: 'Purchase',
+        completed: false
+    }
+]
+
 function generateHistoricalData() {
     const data = []
     const now = new Date()
@@ -155,12 +178,32 @@ export function DataProvider({ children }) {
         return SAMPLE_DATA
     })
 
+    const [goals, setGoals] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(GOALS_STORAGE_KEY)
+            if (saved) {
+                try {
+                    return JSON.parse(saved)
+                } catch (e) {
+                    console.error('Failed to parse saved goals:', e)
+                }
+            }
+        }
+        return SAMPLE_GOALS
+    })
+
     // Save to localStorage when transactions change
     useEffect(() => {
         if (typeof window !== 'undefined') {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
         }
     }, [transactions])
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals))
+        }
+    }, [goals])
 
     // CRUD Operations
     const addTransaction = (transaction) => {
@@ -195,15 +238,47 @@ export function DataProvider({ children }) {
         return transactions.filter(t => t.type === 'expense')
     }
 
+    // Goals CRUD
+    const addGoal = (goal) => {
+        const newGoal = {
+            ...goal,
+            id: generateId(),
+            currentAmount: Number(goal.currentAmount) || 0,
+            targetAmount: Number(goal.targetAmount) || 0,
+            completed: false
+        }
+        setGoals(prev => [...prev, newGoal])
+        return newGoal
+    }
+
+    const updateGoal = (id, updates) => {
+        setGoals(prev =>
+            prev.map(g => g.id === id ? { ...g, ...updates } : g)
+        )
+    }
+
+    const deleteGoal = (id) => {
+        setGoals(prev => prev.filter(g => g.id !== id))
+    }
+
+    const toggleGoalCompletion = (id) => {
+        setGoals(prev =>
+            prev.map(g => g.id === id ? { ...g, completed: !g.completed } : g)
+        )
+    }
+
     // Clear all data
     const clearAllData = () => {
         setTransactions([])
+        setGoals([])
         localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(GOALS_STORAGE_KEY)
     }
 
     // Reset to sample data
     const resetToSampleData = () => {
         setTransactions(SAMPLE_DATA)
+        setGoals(SAMPLE_GOALS)
     }
 
     const value = {
@@ -216,6 +291,11 @@ export function DataProvider({ children }) {
         getExpenseTransactions,
         clearAllData,
         resetToSampleData,
+        goals,
+        addGoal,
+        updateGoal,
+        deleteGoal,
+        toggleGoalCompletion
     }
 
     return (
