@@ -1,7 +1,12 @@
-venv/
-.DS_Store
 .env
-__pycache__
+dist/
 node_modules/
-.github/
+package-lock.json
 
+setupTests.js
+.DS_Store
+.idea/
+.vscode/
+
+examples/
+.github/
