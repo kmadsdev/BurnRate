@@ -130,7 +130,7 @@ function Dashboard() {
             <div
                 className="dashboard-grid"
                 style={{
-                    gridTemplateColumns: `repeat(${gridLayout.columns}, 1fr)`,
+                    gridTemplateColumns: `repeat(${gridLayout.columns}, minmax(0, 1fr))`,
                     gridTemplateRows: `repeat(${gridLayout.rows}, minmax(var(--widget-min-height), 1fr))`
                 }}
             >
