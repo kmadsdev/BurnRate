@@ -1,6 +1,17 @@
 // Utility functions for calculations and predictions
 
 /**
+ * Parse a YYYY-MM-DD date string as local time, not UTC.
+ * This fixes timezone-related off-by-one-day bugs.
+ * @param {string} dateStr - Date string in YYYY-MM-DD format
+ * @returns {Date} Date object in local time
+ */
+function parseLocalDate(dateStr) {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    return new Date(year, month - 1, day)
+}
+
+/**
  * Generate a unique ID
  */
 export function generateId() {
@@ -42,7 +53,7 @@ export function filterByPeriod(transactions, period) {
     cutoffDate.setDate(cutoffDate.getDate() - days)
 
     return transactions.filter(t => {
-        const tDate = new Date(t.date)
+        const tDate = parseLocalDate(t.date)
         return tDate >= cutoffDate
     })
 }
@@ -95,7 +106,7 @@ export function getMonthlyAggregates(transactions, months = 12) {
         const month = date.getMonth()
 
         const monthTransactions = transactions.filter(t => {
-            const tDate = new Date(t.date)
+            const tDate = parseLocalDate(t.date)
             return tDate.getFullYear() === year && tDate.getMonth() === month
         })
 
@@ -241,7 +252,7 @@ export function getBalanceHistory(transactions, days = 7) {
 
         // Get transactions up to this day
         const transUpToDay = transactions.filter(t => {
-            const tDate = new Date(t.date)
+            const tDate = parseLocalDate(t.date)
             return tDate <= date
         })
 
@@ -291,7 +302,7 @@ export function getChartPoints(transactions, type, days = 7) {
 
         // Filter transactions for THIS DAY only (not cumulative)
         const dayTransactions = transactions.filter(t => {
-            const tDate = new Date(t.date)
+            const tDate = parseLocalDate(t.date)
             return tDate.getDate() === date.getDate() &&
                 tDate.getMonth() === date.getMonth() &&
                 tDate.getFullYear() === date.getFullYear()

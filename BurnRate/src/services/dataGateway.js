@@ -171,11 +171,64 @@ function normalizeRow(row, schema) {
 
 // ==================== EXPORT FUNCTIONS ====================
 
+// Rate limiting constants
+const RATE_LIMIT_KEY = 'burnrate-export-rate-limit'
+const RATE_LIMIT_MAX = 50
+const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000 // 30 minutes
+
+/**
+ * Get current timestamp for export filename (YYYY-MM-DD_HH-mm-ss)
+ * @returns {string} Formatted timestamp
+ */
+function getExportTimestamp() {
+    const now = new Date()
+    const date = now.toISOString().split('T')[0]
+    const time = now.toTimeString().split(' ')[0].replace(/:/g, '-')
+    return `${date}_${time}`
+}
+
+/**
+ * Check rate limit and record a new download
+ * @throws {Error} If rate limit exceeded
+ * @returns {void}
+ */
+function checkRateLimit() {
+    const now = Date.now()
+    const storedData = localStorage.getItem(RATE_LIMIT_KEY)
+    let downloads = []
+
+    if (storedData) {
+        try {
+            downloads = JSON.parse(storedData)
+        } catch (e) {
+            downloads = []
+        }
+    }
+
+    // Filter to only downloads within the rate limit window
+    downloads = downloads.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS)
+
+    if (downloads.length >= RATE_LIMIT_MAX) {
+        // Find oldest download in window to calculate when limit resets
+        const oldestDownload = Math.min(...downloads)
+        const resetTime = new Date(oldestDownload + RATE_LIMIT_WINDOW_MS)
+        const minutesRemaining = Math.ceil((resetTime - now) / 60000)
+        throw new Error(`Rate limit exceeded. You can download again in ${minutesRemaining} minute${minutesRemaining !== 1 ? 's' : ''}.`)
+    }
+
+    // Record this download
+    downloads.push(now)
+    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(downloads))
+}
+
 /**
  * Exports data to a CSV file and triggers download
  * @param {Object} data - { transactions, goals, currency }
+ * @throws {Error} If rate limit exceeded
  */
 export function exportToCSV(data) {
+    checkRateLimit()
+
     const workbook = XLSX.utils.book_new()
 
     // Transactions sheet
@@ -196,8 +249,8 @@ export function exportToCSV(data) {
     XLSX.utils.book_append_sheet(workbook, settingsSheet, 'settings')
 
     // Generate and download
-    const timestamp = new Date().toISOString().split('T')[0]
-    XLSX.writeFile(workbook, `burnrate-export-${timestamp}.csv`, { bookType: 'csv' })
+    const timestamp = getExportTimestamp()
+    XLSX.writeFile(workbook, `burnrate_export-${timestamp}.csv`, { bookType: 'csv' })
 }
 
 /**
@@ -205,6 +258,8 @@ export function exportToCSV(data) {
  * @param {Object} data - { transactions, goals, currency }
  */
 export function exportToXLSX(data) {
+    checkRateLimit()
+
     const workbook = XLSX.utils.book_new()
 
     // Transactions sheet
@@ -225,8 +280,8 @@ export function exportToXLSX(data) {
     XLSX.utils.book_append_sheet(workbook, settingsSheet, 'settings')
 
     // Generate and download
-    const timestamp = new Date().toISOString().split('T')[0]
-    XLSX.writeFile(workbook, `burnrate-export-${timestamp}.xlsx`, { bookType: 'xlsx' })
+    const timestamp = getExportTimestamp()
+    XLSX.writeFile(workbook, `burnrate_export-${timestamp}.xlsx`, { bookType: 'xlsx' })
 }
 
 // ==================== IMPORT FUNCTIONS ====================

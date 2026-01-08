@@ -9,6 +9,15 @@ function TransactionForm({
 }) {
     const { getCategoryNames } = useData()
 
+    // Get today's date in YYYY-MM-DD format using local time (not UTC)
+    const getLocalDateString = () => {
+        const now = new Date()
+        const year = now.getFullYear()
+        const month = String(now.getMonth() + 1).padStart(2, '0')
+        const day = String(now.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
+
     const [formData, setFormData] = useState({
         type: transaction?.type || type,
         name: transaction?.name || '',
@@ -17,7 +26,7 @@ function TransactionForm({
         category: transaction?.category || '',
         frequency: transaction?.frequency || 'once',
         customDays: transaction?.customDays || '',
-        date: transaction?.date || new Date().toISOString().split('T')[0],
+        date: transaction?.date || getLocalDateString(),
         description: transaction?.description || ''
     })
 

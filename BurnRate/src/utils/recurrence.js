@@ -6,6 +6,17 @@
  */
 
 /**
+ * Parse a YYYY-MM-DD date string as local time, not UTC.
+ * This fixes the off-by-one-day bug for timezones west of UTC.
+ * @param {string} dateStr - Date string in YYYY-MM-DD format
+ * @returns {Date} Date object in local time
+ */
+function parseLocalDate(dateStr) {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    return new Date(year, month - 1, day)
+}
+
+/**
  * Calculate the next occurrence date based on frequency
  * @param {Date} fromDate - Starting date
  * @param {string} frequency - 'weekly', 'monthly', 'yearly', 'custom'
@@ -47,7 +58,7 @@ export function getNextOccurrence(fromDate, frequency, customDays = null) {
 export function getRecurringOccurrences(transaction, startDate, endDate) {
     if (transaction.frequency === 'once') {
         // One-time transactions - just check if in range
-        const transDate = new Date(transaction.date)
+        const transDate = parseLocalDate(transaction.date)
         if (transDate >= startDate && transDate <= endDate) {
             return [{
                 ...transaction,
@@ -59,7 +70,7 @@ export function getRecurringOccurrences(transaction, startDate, endDate) {
     }
 
     const occurrences = []
-    let currentDate = new Date(transaction.date)
+    let currentDate = parseLocalDate(transaction.date)
 
     // Skip to first occurrence on or after startDate
     while (currentDate < startDate) {
@@ -154,7 +165,7 @@ export function calculateOneTimeTotal(transactions, type, startDate, endDate) {
     return transactions
         .filter(t => t.type === type && t.frequency === 'once')
         .filter(t => {
-            const date = new Date(t.date)
+            const date = parseLocalDate(t.date)
             return date >= startDate && date <= endDate
         })
         .reduce((sum, t) => sum + t.amount, 0)
