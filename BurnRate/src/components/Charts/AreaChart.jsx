@@ -9,7 +9,8 @@ function AreaChart({
     strokeColor = '#FF4F79',
     fillColor = 'rgba(255, 79, 121, 0.2)',
     strokeWidth = 3,
-    data = null // Optional: full data with labels for tooltips
+    data = null, // Optional: full data with labels for tooltips
+    currency = '$'
 }) {
     const [tooltip, setTooltip] = useState(null)
     const [containerRef, dimensions] = useChartDimensions()
@@ -139,7 +140,7 @@ function AreaChart({
                     <div style={{ fontWeight: 600 }}>
                         {/* Format value as currency if it looks like a number */}
                         {typeof tooltip.value === 'number' ?
-                            (tooltip.value >= 1000 ? `$${(tooltip.value / 1000).toFixed(1)}k` : `$${tooltip.value}`)
+                            (tooltip.value >= 1000 ? `${currency}${(tooltip.value / 1000).toFixed(1)}k` : `${currency}${tooltip.value}`)
                             : tooltip.value}
                     </div>
                     {tooltip.label && <div style={{ opacity: 0.7, fontSize: '10px' }}>{tooltip.label}</div>}

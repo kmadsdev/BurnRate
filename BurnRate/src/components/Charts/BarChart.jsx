@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { formatCurrency } from '../../utils/calculations'
 
-function BarChart({ data, height = 100, barColor = 'rgba(255, 255, 255, 0.64)' }) {
+function BarChart({ data, height = 100, barColor = 'rgba(255, 255, 255, 0.64)', currency = '$' }) {
     const [tooltip, setTooltip] = useState(null)
 
     if (!data || data.length === 0) return null
@@ -55,7 +55,7 @@ function BarChart({ data, height = 100, barColor = 'rgba(255, 255, 255, 0.64)' }
                         zIndex: 9999
                     }}
                 >
-                    <div style={{ fontWeight: 600 }}>{formatCurrency(tooltip.value)}</div>
+                    <div style={{ fontWeight: 600 }}>{formatCurrency(tooltip.value, currency)}</div>
                     <div style={{ opacity: 0.7, fontSize: '10px' }}>{tooltip.day}</div>
                 </div>,
                 document.body

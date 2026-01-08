@@ -8,7 +8,8 @@ function LineChart({
     width = 600,
     height = 200,
     labels = ['2k', '4k', '6k', '8k', '10k'],
-    timeline = []
+    timeline = [],
+    currency = '$'
 }) {
     const [tooltip, setTooltip] = useState(null)
     const [containerRef, dimensions] = useChartDimensions()
@@ -139,9 +140,9 @@ function LineChart({
 
     const formatValue = (value) => {
         if (value >= 1000) {
-            return `$${(value / 1000).toFixed(1)}k`
+            return `${currency}${(value / 1000).toFixed(1)}k`
         }
-        return `$${value}`
+        return `${currency}${value}`
     }
 
     return (
