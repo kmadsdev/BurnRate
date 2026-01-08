@@ -120,35 +120,68 @@ export function getMonthlyAggregates(transactions, months = 12) {
 }
 
 /**
- * Calculate predictions using min/max/avg
+ * Calculate predictions using recurring transactions + average one-time
+ * Predictions = subscriptions total (fixed recurring) + predicted one-time based on history
+ * @param {Array} monthlyData - Historical monthly data
+ * @param {Array} transactions - Raw transactions for recurring analysis
+ * @param {number} numMonths - Number of months to predict
  */
-export function predictNext(monthlyData, numMonths = 3) {
+export function predictNext(monthlyData, numMonths = 3, transactions = []) {
     if (monthlyData.length === 0) {
         return []
     }
 
-    const incomeValues = monthlyData.map(m => m.income).filter(v => v > 0)
-    const expenseValues = monthlyData.map(m => m.expense).filter(v => v > 0)
+    // Separate recurring and one-time transactions
+    const recurringTransactions = transactions.filter(t => t.frequency !== 'once')
+    const oneTimeTransactions = transactions.filter(t => t.frequency === 'once')
 
-    // Calculate averages
-    const avgIncome = incomeValues.length > 0
-        ? incomeValues.reduce((a, b) => a + b, 0) / incomeValues.length
+    // Calculate monthly recurring totals
+    const monthlyRecurringIncome = recurringTransactions
+        .filter(t => t.type === 'income' && t.frequency === 'monthly')
+        .reduce((sum, t) => sum + t.amount, 0)
+
+    const monthlyRecurringExpense = recurringTransactions
+        .filter(t => t.type === 'expense' && t.frequency === 'monthly')
+        .reduce((sum, t) => sum + t.amount, 0)
+
+    // Calculate average one-time from historical data
+    // Subtract recurring to get one-time averages
+    const oneTimeIncomeValues = monthlyData
+        .map(m => Math.max(0, m.income - monthlyRecurringIncome))
+        .filter(v => v >= 0)
+
+    const oneTimeExpenseValues = monthlyData
+        .map(m => Math.max(0, m.expense - monthlyRecurringExpense))
+        .filter(v => v >= 0)
+
+    const avgOneTimeIncome = oneTimeIncomeValues.length > 0
+        ? oneTimeIncomeValues.reduce((a, b) => a + b, 0) / oneTimeIncomeValues.length
         : 0
-    const avgExpense = expenseValues.length > 0
-        ? expenseValues.reduce((a, b) => a + b, 0) / expenseValues.length
+
+    const avgOneTimeExpense = oneTimeExpenseValues.length > 0
+        ? oneTimeExpenseValues.reduce((a, b) => a + b, 0) / oneTimeExpenseValues.length
         : 0
 
     const predictions = []
-    const lastMonth = monthlyData[monthlyData.length - 1]
     const now = new Date()
 
     for (let i = 1; i <= numMonths; i++) {
         const date = new Date(now.getFullYear(), now.getMonth() + i, 1)
+
+        // Total = recurring (fixed) + average one-time
+        const predictedIncome = monthlyRecurringIncome + Math.round(avgOneTimeIncome)
+        const predictedExpense = monthlyRecurringExpense + Math.round(avgOneTimeExpense)
+
         predictions.push({
             month: date.toLocaleString('en-US', { month: 'short' }),
             year: date.getFullYear(),
-            income: Math.round(avgIncome),
-            expense: Math.round(avgExpense),
+            income: Math.round(predictedIncome),
+            expense: Math.round(predictedExpense),
+            // Breakdown for display
+            recurringIncome: monthlyRecurringIncome,
+            recurringExpense: monthlyRecurringExpense,
+            oneTimeIncome: Math.round(avgOneTimeIncome),
+            oneTimeExpense: Math.round(avgOneTimeExpense),
             predicted: true
         })
     }
