@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useData } from '../context/DataContext'
 import { formatCurrency } from '../utils/calculations'
 
@@ -30,6 +30,17 @@ const CheckIcon = () => (
     </svg>
 )
 
+const COLORS = [
+    { value: '#3B82F6', label: 'Blue' },
+    { value: '#8B5CF6', label: 'Purple' },
+    { value: '#EC4899', label: 'Pink' },
+    { value: '#EF4444', label: 'Red' },
+    { value: '#F97316', label: 'Orange' },
+    { value: '#EAB308', label: 'Yellow' },
+    { value: '#22C55E', label: 'Green' },
+    { value: '#14B8A6', label: 'Teal' },
+]
+
 function GoalModal({ isOpen, onClose, onSave, initialData }) {
     const [formData, setFormData] = useState(
         initialData || {
@@ -37,9 +48,24 @@ function GoalModal({ isOpen, onClose, onSave, initialData }) {
             targetAmount: '',
             currentAmount: '0',
             deadline: '',
+
             category: 'Savings',
+            color: '#3B82F6',
         }
     )
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(initialData || {
+                title: '',
+                targetAmount: '',
+                currentAmount: '0',
+                deadline: '',
+                category: 'Savings',
+                color: '#3B82F6',
+            })
+        }
+    }, [isOpen, initialData])
 
     if (!isOpen) return null
 
@@ -105,6 +131,21 @@ function GoalModal({ isOpen, onClose, onSave, initialData }) {
                         </select>
                     </div>
                     <div className="form-group">
+                        <label>Color</label>
+                        <div className="color-options">
+                            {COLORS.map(c => (
+                                <button
+                                    key={c.value}
+                                    type="button"
+                                    className={`color-option ${formData.color === c.value ? 'selected' : ''}`}
+                                    style={{ backgroundColor: c.value }}
+                                    onClick={() => setFormData({ ...formData, color: c.value })}
+                                    title={c.label}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="form-group">
                         <label>Deadline (Optional)</label>
                         <input
                             type="date"
@@ -123,7 +164,14 @@ function GoalModal({ isOpen, onClose, onSave, initialData }) {
 }
 
 function Goals() {
-    const { goals, addGoal, updateGoal, deleteGoal, toggleGoalCompletion } = useData()
+    const {
+        goals,
+        addGoal,
+        updateGoal,
+        deleteGoal,
+        toggleGoalCompletion,
+        currency
+    } = useData()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingGoal, setEditingGoal] = useState(null)
 
@@ -185,7 +233,11 @@ function Goals() {
                                     </div>
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
-                                            onClick={() => toggleGoalCompletion(goal.id)}
+                                            onClick={() => {
+                                                if (window.confirm(goal.completed ? 'Are you sure you want to reactivate this goal?' : 'Are you sure you want to mark this goal as completed?')) {
+                                                    toggleGoalCompletion(goal.id)
+                                                }
+                                            }}
                                             className="btn-icon"
                                             title={goal.completed ? "Mark as active" : "Mark as completed"}
                                             style={{ color: goal.completed ? 'var(--accent-primary)' : 'var(--text-muted)' }}
@@ -200,7 +252,11 @@ function Goals() {
                                             <EditIcon />
                                         </button>
                                         <button
-                                            onClick={() => deleteGoal(goal.id)}
+                                            onClick={() => {
+                                                if (window.confirm('Are you sure you want to delete this goal?')) {
+                                                    deleteGoal(goal.id)
+                                                }
+                                            }}
                                             className="btn-icon"
                                             title="Delete"
                                             style={{ color: '#FF4F79' }}
@@ -212,8 +268,8 @@ function Goals() {
 
                                 <div style={{ marginBottom: '16px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
-                                        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(goal.currentAmount)}</span>
-                                        <span style={{ color: 'var(--text-muted)' }}>of {formatCurrency(goal.targetAmount)}</span>
+                                        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(goal.currentAmount, currency)}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>of {formatCurrency(goal.targetAmount, currency)}</span>
                                     </div>
                                     <div style={{
                                         height: '8px',
@@ -224,7 +280,7 @@ function Goals() {
                                         <div style={{
                                             width: `${progress}%`,
                                             height: '100%',
-                                            backgroundColor: goal.completed ? 'var(--accent-primary)' : 'var(--accent-secondary, #3B82F6)',
+                                            backgroundColor: goal.completed ? 'var(--text-muted)' : (goal.color || 'var(--accent-primary)'),
                                             borderRadius: '4px',
                                             transition: 'width 0.5s ease'
                                         }} />
@@ -325,6 +381,34 @@ function Goals() {
                     justify-content: flex-end;
                     gap: 12px;
                     margin-top: 24px;
+                }
+                .modal-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                    margin-top: 24px;
+                }
+                .color-options {
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                    margin-top: 8px;
+                }
+                .color-option {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    border: 2px solid transparent;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    padding: 0;
+                }
+                .color-option:hover {
+                    transform: scale(1.1);
+                }
+                .color-option.selected {
+                    border-color: var(--text-primary);
+                    transform: scale(1.1);
                 }
             `}</style>
         </div>
