@@ -6,6 +6,7 @@ import WalletIcon from '../../assets/icons/wallet.svg?react'
 import AnalyticsIcon from '../../assets/icons/analytics.svg?react'
 import CalendarIcon from '../../assets/icons/calendar.svg?react'
 import SettingsIcon from '../../assets/icons/settings.svg?react'
+import CategoriesIcon from '../../assets/icons/categories.svg?react'
 import SunIcon from '../../assets/icons/sun.svg?react'
 import MoonIcon from '../../assets/icons/moon.svg?react'
 import Logo from '../../assets/icons/logo.svg?react'
@@ -15,6 +16,7 @@ const navItems = [
     { path: '/wallet', icon: WalletIcon, label: 'Transactions' },
     { path: '/analytics', icon: AnalyticsIcon, label: 'Analytics' },
     { path: '/calendar', icon: CalendarIcon, label: 'Calendar' },
+    { path: '/categories', icon: CategoriesIcon, label: 'Categories' },
     { path: '/settings', icon: SettingsIcon, label: 'Settings' },
 ]
 
