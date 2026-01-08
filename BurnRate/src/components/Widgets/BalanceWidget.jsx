@@ -19,7 +19,7 @@ const periodToDays = {
 }
 
 function BalanceWidget({ size = '1x1' }) {
-    const { transactions } = useData()
+    const { transactions, currency } = useData()
     const [period, setPeriod] = useState('7 days')
 
     const days = periodToDays[period] || 7
@@ -44,7 +44,7 @@ function BalanceWidget({ size = '1x1' }) {
         >
             <div className="widget-value-container">
                 <div className="widget-value">
-                    <span className="widget-value-prefix">$</span>
+                    <span className="widget-value-prefix">{currency}</span>
                     {new Intl.NumberFormat('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
@@ -57,6 +57,7 @@ function BalanceWidget({ size = '1x1' }) {
                     data={historyData}
                     height={106}
                     barColor="rgba(255, 255, 255, 0.64)"
+                    currency={currency}
                 />
             </div>
         </WidgetContainer>

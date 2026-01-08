@@ -3,6 +3,7 @@ import WidgetContainer from './WidgetContainer'
 import { useData } from '../../context/DataContext'
 import { getCategoryBreakdown, filterByPeriod, formatCurrency } from '../../utils/calculations'
 
+
 function DonutChart({ data, size = 140 }) {
     if (!data || data.length === 0) {
         return (
@@ -62,8 +63,8 @@ const periodToDays = {
 }
 
 function ActivityWidget({ size = '1x1' }) {
-    const { transactions } = useData()
-    const [period, setPeriod] = useState('This month')
+    const { transactions, currency } = useData()
+    const [period, setPeriod] = useState('This Month')
 
     const categoryData = useMemo(() => {
         const filterPeriod = periodToDays[period] || '30 days'
@@ -93,9 +94,9 @@ function ActivityWidget({ size = '1x1' }) {
                                         style={{ backgroundColor: category.color }}
                                     />
                                     <span>{category.name}</span>
-                                    <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
-                                        {formatCurrency(category.amount)} ({category.value}%)
-                                    </span>
+                                    <div className="activity-amount" style={{ color: '#FF4F79' }}>
+                                        {formatCurrency(category.amount, currency)} ({category.value}%)
+                                    </div>
                                 </div>
                             ))
                         ) : (

@@ -13,7 +13,7 @@ const ExpensesIcon = () => (
 )
 
 function ExpensesWidget({ size = '1x1' }) {
-    const { transactions } = useData()
+    const { transactions, currency } = useData()
     const [period, setPeriod] = useState('7 days')
 
     const { totalExpenses, chartPoints } = useMemo(() => {
@@ -38,7 +38,7 @@ function ExpensesWidget({ size = '1x1' }) {
         >
             <div className="widget-value-container">
                 <div className="widget-value" style={{ color: 'var(--text-primary)' }}>
-                    <span className="widget-value-prefix">$</span>
+                    <span className="widget-value-prefix">{currency}</span>
                     {new Intl.NumberFormat('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
@@ -53,6 +53,7 @@ function ExpensesWidget({ size = '1x1' }) {
                     fillColor="rgba(255, 79, 121, 0.2)"
                     height={120}
                     width={250}
+                    currency={currency}
                 />
             </div>
         </WidgetContainer>

@@ -28,7 +28,7 @@ const frequencyToMonthly = (amount, frequency, customDays) => {
 }
 
 function SubscriptionsWidget({ size = '1x1' }) {
-    const { transactions } = useData()
+    const { transactions, currency } = useData()
 
     // Get recurring expenses (subscriptions)
     const subscriptions = transactions.filter(t =>
@@ -71,26 +71,26 @@ function SubscriptionsWidget({ size = '1x1' }) {
         >
             <div className="subscriptions-widget">
                 <div className="subscriptions-summary">
-                    <div className="subscriptions-stat">
+                    <div className="subscriptions-summary-item">
                         <span className="subscriptions-label">Monthly</span>
-                        <span className="subscriptions-value">{formatCurrency(monthlyTotal)}</span>
+                        <span className="subscriptions-value">{formatCurrency(monthlyTotal, currency)}</span>
                     </div>
-                    <div className="subscriptions-stat">
+                    <div className="subscriptions-summary-item">
                         <span className="subscriptions-label">Yearly</span>
-                        <span className="subscriptions-value">{formatCurrency(yearlyTotal)}</span>
+                        <span className="subscriptions-value">{formatCurrency(yearlyTotal, currency)}</span>
                     </div>
                 </div>
 
                 <div className="subscriptions-list">
                     {sortedSubs.length > 0 ? (
                         sortedSubs.map(sub => (
-                            <div key={sub.id} className="subscription-item">
-                                <div className="subscription-info">
-                                    <span className="subscription-name">{sub.description || sub.category}</span>
-                                    <span className="subscription-category">{sub.category}</span>
+                            <div key={sub.id} className="subscription-details">
+                                <div className="subscription-header">
+                                    <span className="subscription-title">{sub.description || sub.category}</span>
+                                    <span className="subscription-amount">{formatCurrency(sub.amount, currency)}</span>
                                 </div>
-                                <span className="subscription-amount">
-                                    {formatCurrency(sub.amount)}
+                                <span className="subscription-category">{sub.category}</span>
+                                <span className="subscription-frequency">
                                     <small>{getFrequencyLabel(sub.frequency)}</small>
                                 </span>
                             </div>

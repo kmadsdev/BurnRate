@@ -11,7 +11,7 @@ const periodToMonths = {
 }
 
 function HistoryWidget({ size = '2x1' }) {
-    const { transactions } = useData()
+    const { transactions, currency } = useData()
     const [period, setPeriod] = useState('6 months')
 
     const { incomeData, outcomeData, timeline } = useMemo(() => {
@@ -70,6 +70,7 @@ function HistoryWidget({ size = '2x1' }) {
                         timeline={timeline}
                         width={550}
                         height={220}
+                        currency={currency}
                     />
                 </div>
             </div>

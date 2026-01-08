@@ -5,7 +5,7 @@ import { useData } from '../../context/DataContext'
 import { formatCurrency } from '../../utils/calculations'
 
 function GoalsWidget({ size = '1x1' }) {
-    const { goals } = useData()
+    const { goals, currency } = useData()
     const navigate = useNavigate()
 
     // Filter active goals (not completed)
@@ -32,11 +32,14 @@ function GoalsWidget({ size = '1x1' }) {
         >
             <div className="goals-container" style={{
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: size === '2x1' ? 'row' : 'column',
                 gap: '12px',
                 height: '100%',
-                justifyContent: displayGoals.length > 0 ? 'flex-start' : 'center',
-                paddingTop: displayGoals.length > 0 ? '4px' : '0'
+                alignItems: size === '2x1' ? 'center' : 'stretch',
+                justifyContent: displayGoals.length > 0
+                    ? (size === '2x1' ? 'space-around' : 'flex-start')
+                    : 'center',
+                paddingTop: displayGoals.length > 0 && size !== '2x1' ? '4px' : '0'
             }}>
                 {displayGoals.length > 0 ? (
                     displayGoals.map((goal) => {
@@ -53,20 +56,22 @@ function GoalsWidget({ size = '1x1' }) {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    flex: size === '2x1' ? 1 : 'initial',
+                                    maxWidth: size === '2x1' ? '50%' : '100%'
                                 }}
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     handleGoalClick(goal.id)
                                 }}
                             >
-                                <div className="goal-chart">
+                                <div className="goal-chart" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <PieChart
                                         percentage={percentage}
-                                        size={40}
-                                        strokeWidth={4}
-                                        color="var(--accent-primary)"
-                                        backgroundColor="var(--bg-hover)"
+                                        size={50}
+                                        strokeWidth={5}
+                                        color={goal.color || "var(--accent-primary)"}
+                                        backgroundColor={goal.color ? `${goal.color}33` : "var(--bg-hover)"}
                                         showLabel={false}
                                     />
                                 </div>
@@ -86,7 +91,12 @@ function GoalsWidget({ size = '1x1' }) {
                                         color: 'var(--text-muted)',
                                         marginTop: '2px'
                                     }}>
-                                        {formatCurrency(goal.currentAmount || 0)} / {formatCurrency(goal.targetAmount || 0)}
+                                        <div className="goal-info">
+                                            <h4 className="goal-title">{goal.title}</h4>
+                                            <span className="goal-amount">
+                                                {formatCurrency(goal.currentAmount || 0, currency)} / {formatCurrency(goal.targetAmount || 0, currency)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
