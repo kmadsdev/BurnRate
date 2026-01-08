@@ -11,6 +11,7 @@ import Analytics from './pages/Analytics'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 import Goals from './pages/Goals'
+import Categories from './pages/Categories'
 
 function App() {
     useEffect(() => {
@@ -51,6 +52,7 @@ function App() {
                                     <Route path="/analytics" element={<Analytics />} />
                                     <Route path="/goals" element={<Goals />} />
                                     <Route path="/calendar" element={<Calendar />} />
+                                    <Route path="/categories" element={<Categories />} />
                                     <Route path="/settings" element={<Settings />} />
                                 </Routes>
                             </main>
