@@ -1,14 +1,16 @@
 {
   "name": "burnrate",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && touch dist/.nojekyll && cp dist/index.html",
     "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -b gh-pages --no-history",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "lenis": "^1.0.42",
