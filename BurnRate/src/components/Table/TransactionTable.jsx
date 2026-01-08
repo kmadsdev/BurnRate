@@ -1,4 +1,5 @@
 import { formatCurrency } from '../../utils/calculations'
+import { useData } from '../../context/DataContext'
 
 const EditIcon = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -30,6 +31,8 @@ function TransactionTable({
     onDelete,
     emptyMessage = 'No transactions yet'
 }) {
+    const { currency } = useData()
+
     if (transactions.length === 0) {
         return (
             <div className="table-empty">
@@ -64,10 +67,11 @@ function TransactionTable({
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Company</th>
                         <th>Category</th>
-                        <th>Description</th>
                         <th>Frequency</th>
+                        <th>Date</th>
                         <th className="text-right">Amount</th>
                         <th className="text-center">Actions</th>
                     </tr>
@@ -75,18 +79,21 @@ function TransactionTable({
                 <tbody>
                     {sortedTransactions.map((transaction) => (
                         <tr key={transaction.id}>
-                            <td className="table-date">{formatDate(transaction.date)}</td>
+                            <td className="table-name">
+                                <span className="transaction-name">{transaction.name || transaction.description || '—'}</span>
+                            </td>
+                            <td className="table-company">
+                                {transaction.company || '—'}
+                            </td>
                             <td>
                                 <span className="category-badge">{transaction.category}</span>
-                            </td>
-                            <td className="table-description">
-                                {transaction.description || '—'}
                             </td>
                             <td className="table-frequency">
                                 {getFrequencyLabel(transaction)}
                             </td>
+                            <td className="table-date">{formatDate(transaction.date)}</td>
                             <td className={`table-amount text-right ${transaction.type}`}>
-                                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, currency)}
                             </td>
                             <td className="table-actions text-center">
                                 <button
@@ -108,6 +115,17 @@ function TransactionTable({
                     ))}
                 </tbody>
             </table>
+
+            <style>{`
+                .table-name .transaction-name {
+                    font-weight: 500;
+                    color: var(--text-primary);
+                }
+                .table-company {
+                    color: var(--text-secondary);
+                    font-size: 13px;
+                }
+            `}</style>
         </div>
     )
 }

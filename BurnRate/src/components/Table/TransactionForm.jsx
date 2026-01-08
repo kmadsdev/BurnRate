@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { incomeCategories, expenseCategories } from '../../utils/calculations'
+import { useData } from '../../context/DataContext'
 
 function TransactionForm({
     transaction = null,
@@ -7,8 +7,12 @@ function TransactionForm({
     onSubmit,
     onCancel
 }) {
+    const { getCategoryNames } = useData()
+
     const [formData, setFormData] = useState({
         type: transaction?.type || type,
+        name: transaction?.name || '',
+        company: transaction?.company || '',
         amount: transaction?.amount || '',
         category: transaction?.category || '',
         frequency: transaction?.frequency || 'once',
@@ -17,7 +21,7 @@ function TransactionForm({
         description: transaction?.description || ''
     })
 
-    const categories = formData.type === 'income' ? incomeCategories : expenseCategories
+    const categories = getCategoryNames(formData.type)
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -61,6 +65,32 @@ function TransactionForm({
                             <option value="income">Income</option>
                             <option value="expense">Expense</option>
                         </select>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label htmlFor="name">Transaction Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="e.g., Monthly Salary"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="company">Company / Vendor</label>
+                            <input
+                                type="text"
+                                id="company"
+                                name="company"
+                                value={formData.company}
+                                onChange={handleChange}
+                                placeholder="e.g., TechCorp Inc."
+                            />
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -127,7 +157,7 @@ function TransactionForm({
                     )}
 
                     <div className="form-group">
-                        <label htmlFor="date">Date</label>
+                        <label htmlFor="date">Start Date</label>
                         <input
                             type="date"
                             id="date"
@@ -139,14 +169,14 @@ function TransactionForm({
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="description">Description</label>
+                        <label htmlFor="description">Description (Optional)</label>
                         <input
                             type="text"
                             id="description"
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            placeholder="Optional description..."
+                            placeholder="Additional notes..."
                         />
                     </div>
 
@@ -160,6 +190,19 @@ function TransactionForm({
                     </div>
                 </form>
             </div>
+
+            <style>{`
+                .form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                }
+                @media (max-width: 500px) {
+                    .form-row {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            `}</style>
         </div>
     )
 }
